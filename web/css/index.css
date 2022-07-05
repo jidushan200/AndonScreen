@@ -1,0 +1,289 @@
+/*媒体查询 根元素font-size*/
+html {
+    font-size: 62.5%
+}
+
+@media only screen and (min-width: 481px) {
+    html {
+        font-size: 94% !important
+    }
+}
+
+@media only screen and (min-width: 561px) {
+    html {
+        font-size: 109% !important
+    }
+}
+
+@media only screen and (min-width: 641px) {
+    html {
+        font-size: 125% !important
+    }
+}
+
+/*开始*/
+.bgc {
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/bg_Frm_Main.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding-top: 7%;
+    box-sizing: border-box;
+    color: #fff;
+}
+
+#box {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+}
+
+.box_title span {
+    display: inline-block;
+    height: 100%;
+}
+
+.box_title img {
+    display: inline-block;
+    height: 100%;
+}
+
+/*盒子整体*/
+.leftBox {
+    flex: 3;
+}
+
+.midBox {
+    flex: 6;
+}
+
+.rightBox {
+    flex: 3;
+}
+
+/*左侧盒子*/
+:root {
+    --borderColor: #20D6E2;
+    --borderWidth: 10px;
+}
+
+.left_box_01 {
+    flex: 2;
+}
+
+.left_box_02 {
+    flex: 3;
+}
+
+.left_box_03 {
+    flex: 2;
+
+}
+
+/*边框边角*/
+.border_corner {
+    background: linear-gradient(to right, var(--borderColor), var(--borderColor)) left top no-repeat,
+    linear-gradient(to bottom, var(--borderColor), var(--borderColor)) left top no-repeat,
+    linear-gradient(to left, var(--borderColor), var(--borderColor)) right top no-repeat,
+    linear-gradient(to bottom, var(--borderColor), var(--borderColor)) right top no-repeat,
+    linear-gradient(to right, var(--borderColor), var(--borderColor)) left bottom no-repeat,
+    linear-gradient(to top, var(--borderColor), var(--borderColor)) left bottom no-repeat,
+    linear-gradient(to left, var(--borderColor), var(--borderColor)) right bottom no-repeat,
+    linear-gradient(to top, var(--borderColor), var(--borderColor)) right bottom no-repeat;
+    background-size: 2px var(--borderWidth), var(--borderWidth) 2px, 2px var(--borderWidth), var(--borderWidth) 2px;
+}
+
+/*盒子遮罩层*/
+.boxBGC {
+    padding: 0 2%;;
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/*Box：头*/
+.box_title {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    font-size: 23px;
+}
+
+/*Box: 内容*/
+.box_content {
+    margin-top: 1%;
+    width: 100%;
+}
+
+/*左1*/
+#b1 div {
+    margin-top: 23px;
+}
+
+#b1 p {
+    float: left;
+    width: 50%;
+    font-size: 22px;
+}
+
+#b1 p span {
+    display: inline-block;
+    width: 45%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border: 1.5px solid #0E498A;
+    border-radius: 7%;
+    box-shadow: 0 0 7px rgba(14, 73, 138, .5);
+    margin-left: 10%;
+}
+
+.b1_last {
+    margin-left: 5% !important;
+}
+
+/*左2*/
+/*echart*/
+.mainEchart {
+    height: 82%;
+}
+
+#main {
+    width: 100%;
+    height: 100%;
+}
+
+/*左3*/
+.bt_3_3 {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 145px;
+    height: 43px;
+    line-height: 40px;
+    text-align: center;
+
+    color: red;
+    background: url(../images/alarm_count_border.png) no-repeat;
+    background-size: contain;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.bt_3_3 p {
+    margin-left: 10%;
+    display: inline-block;
+    text-align: center;
+}
+
+.bc_3 {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 75%;
+}
+
+.bc_3_3 {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.bc_3_3 ul {
+    background: url(../images/alarm_details.png) no-repeat;
+    background-size: 100% 105%;
+    padding: 2% 4% 3% 4%;
+    box-sizing: border-box;
+    font-size: 21px;
+    font-weight: 700;
+    width: 100%;
+    height: 100%;
+}
+
+.bc_3_3 ul li {
+    color: #05B4E9;
+    margin-top: 5%;
+}
+
+.bc_3_3 ul li span {
+    margin-left: 3%;
+    display: inline-block;
+    color: red;
+    vertical-align: baseline;
+}
+
+/*中间*/
+.midBoxSVG {
+    height: 93%;
+    position: relative;
+}
+
+.midBoxSvgBox {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+/*右box*/
+.iframeBox {
+    margin-top: 6%;
+    height: 90%;
+}
+
+iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/*svg*/
+#N117Box{
+    width: 100%;
+    height: 100%;
+}
+
+/*!*滚动条开始*!*/
+/*.rightBoxScrollBox {*/
+/*height: 90%;*/
+/*}*/
+
+/*.mechanism {*/
+/*height: 100%;*/
+/*overflow: hidden;*/
+
+/*text-align: center;*/
+/*font-size: 18px;*/
+/*color: red;*/
+/*}*/
+
+/*.re_roll {*/
+/*height: 100%;*/
+/*-webkit-animation: 10s rowup linear infinite normal; !*播放时长 动画名称 播放次数 播放延迟*!*/
+/*animation: 10s rowup linear infinite normal;*/
+/*font-weight: 700;*/
+/*}*/
+
+/*!*鼠标经过停止滚动*!*/
+/*.mechanism:hover .re_roll {*/
+/*animation-play-state: paused;*/
+/*}*/
+
+/*@keyframes rowup {*/
+/*0% {*/
+/*-webkit-transform: translate3d(0, 0, 0);*/
+/*transform: translate3d(0, 0, 0);*/
+/*}*/
+/*100% {*/
+/*!*(此处列表高度列如：-200px)*!*/
+/*-webkit-transform: translate3d(0, -200%, 0);*/
+/*transform: translate3d(0, -200%, 0);*/
+
+/*}*/
+/*}*/
+/*!*滚动条结束*!*/
