@@ -1,0 +1,85 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    font-family: "microsoft yahei";
+}
+
+* {
+    box-sizing: border-box;
+}
+
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+html, body {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.foregreen {
+    color: lightgreen;
+}
+
+.forered {
+    color: red;
+}
+
+.forewhite {
+    color: white;
+}
+
+.foreyellow {
+    color: lightyellow;
+}
+
+.foreblue {
+    color: blue;
+}
+
+.bgblack {
+    background: black;
+}
+
+.bgred {
+    background: red;
+}
+
+.bgyellow {
+    background: lightyellow;
+}
+
+.bglightblue {
+    background: lightyellow;
+}
+
+.bgblue {
+    background: blue;
+}
+
+.rounded {
+    border-radius: 15px;
+}
+
+.normalfont {
+    font-family: 'Microsoft YaHei';
+    font-size: 20px;
+}
+
+.innertable {
+    border-width: 0px;
+    border-style: hidden;
+}
+
+.noborder {
+    border: none;
+}
+
+@font-face {
+    font-family: YouSheBiaoTiHei;
+    src: url('images/YouSheBiaoTiHei.woff2') format('woff2');
+}
+
