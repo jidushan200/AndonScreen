@@ -1,0 +1,1151 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="echarts.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="Style.css">
+    <style>
+        body {
+            color: #fff;
+        }
+
+        /*外部容器*/
+        div.container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /*内部框架*/
+        div.frame {
+            position: relative;
+            width: 1600px;
+            height: 900px;
+            background: url('images/bg_main.png') no-repeat;
+            background-size: 100% 100%;
+        }
+
+        /*标题*/
+        div.frame div.title {
+            position: relative;
+            width: 100%;
+            top: 15px;
+            text-align: center;
+        }
+
+        div.frame div.title span {
+            font-family: YouSheBiaoTiHei;
+            font-weight: normal;
+            font-size: 48px;
+            color: #00deff;
+        }
+
+        /*时钟显示*/
+        div.frame #time {
+            display: block;
+            width: 350px;
+            position: absolute;
+            top: 50px;
+            left: 75%;
+            font-family: YouSheBiaoTiHei;
+            font-weight: normal;
+            font-size: 28px;
+            color: #00deff;
+        }
+
+        /*功能方框样式：短折线边角*/
+        :root {
+            --cornerColor: #20D6E2; /*边角的线颜色*/
+            --cornerlineLen: 10px; /*边角的线长度*/
+            --cornerlineWidth: 2px; /*边角的线宽*/
+        }
+
+        .box_corner {
+            background: linear-gradient(to right, var(--cornerColor), var(--cornerColor)) left top no-repeat, linear-gradient(to bottom, var(--cornerColor), var(--cornerColor)) left top no-repeat, linear-gradient(to left, var(--cornerColor), var(--cornerColor)) right top no-repeat, linear-gradient(to bottom, var(--cornerColor), var(--cornerColor)) right top no-repeat, linear-gradient(to right, var(--cornerColor), var(--cornerColor)) left bottom no-repeat, linear-gradient(to top, var(--cornerColor), var(--cornerColor)) left bottom no-repeat, linear-gradient(to left, var(--cornerColor), var(--cornerColor)) right bottom no-repeat, linear-gradient(to top, var(--cornerColor), var(--cornerColor)) right bottom no-repeat;
+            background-size: var(--cornerlineWidth) var(--cornerlineLen), var(--cornerlineLen) var(--cornerlineWidth), var(--cornerlineWidth) var(--cornerlineLen), var(--cornerlineLen) var(--cornerlineWidth);
+        }
+
+        /*表格布局*/
+        table#tb {
+            position: relative;
+            width: 99%;
+            height: calc(100% - 101px);
+            top: 27px;
+            left: 16px;
+            border-spacing: 8px;
+        }
+
+        table#tb > tbody > tr:nth-child(1) > td:nth-child(1) {
+            width: 18%;
+            height: 20%;
+        }
+
+        table#tb > tbody > tr:nth-child(2) > td:nth-child(1) {
+            width: 18%;
+            height: 20%;
+        }
+
+        table#tb > tbody > tr:nth-child(3) > td:nth-child(1) {
+            width: 18%;
+            height: 60%;
+        }
+
+        table#tb > tbody > tr:nth-child(1) > td:nth-child(3) {
+            width: 18%;
+        }
+
+        /*显示框*/
+        div.box_corner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        div.box_corner::before {
+            display: block;
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /*显示框标题和装饰图形*/
+        span.subtitle {
+            font-family: YouSheBiaoTiHei;
+            font-weight: normal;
+            font-size: 20px;
+            color: #fff;
+            display: inline-block;
+            position: absolute;
+            top: 5px;
+            left: 10px;
+        }
+
+        span.subtitle11 {
+            font-family: YouSheBiaoTiHei;
+            font-weight: normal;
+            font-size: 20px;
+            color: #fff;
+            display: inline-block;
+            position: absolute;
+            top: 5px;
+            left: 10px;
+        }
+
+        span.subtitle::after {
+            display: inline-block;
+            content: '';
+            background: url('images/panel_title_ico.png') 100% 100%;
+            position: absolute;
+            width: 180px;
+            height: 25px;
+            top: 0px;
+            left: 75px;
+        }
+
+        /*产量展示*/
+        .yieldview > table {
+            width: 100%;
+            height: 100%;
+            padding: 41px 5px 3px 7px;
+            border-spacing: 0px;
+        }
+
+        .yieldview > table > tbody > tr > td {
+            font-family: YouSheBiaoTiHei;
+            font-weight: normal;
+            font-size: 13px;
+            color: #fff;
+            padding: 0 3px;
+        }
+
+        .yieldview > table > tbody > tr > td > span {
+            display: inline-block;
+            height: 30px;
+            width: 71px;
+            line-height: 24px;
+            text-align: center;
+            border: 3px solid #0E498A;
+            border-radius: 5px;
+            box-shadow: 3px 3px 14px rgba(14, 140, 138, .5);
+        }
+
+        /*告警统计图*/
+        .warningchartview > div {
+            width: 100%;
+            height: 100%;
+            padding: 40px 10px 10px 10px;
+        }
+
+        .warningchartview > div > div#WarningChart {
+            width: 100%;
+            height: 100%;
+        }
+
+        /*设备告警数量*/
+        span.warningnum {
+            display: inline-block;
+            width: 100px;
+            height: 30px;
+            line-height: 30px;
+            position: absolute;
+            right: 0px;
+            top: 5px;
+            text-align: left;
+            font-family: YouSheBiaoTiHei;
+            font-weight: normal;
+            font-size: 20px;
+            color: #f00;
+        }
+
+        /*公告板展示*/
+        .bulletinview > div {
+            width: 100%;
+            height: 100%;
+            padding: 40px 10px 10px 10px;
+        }
+
+        .bulletinview > div > iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+        /*设备状态展示*/
+        .drawingview > div {
+            width: 100%;
+            height: 100%;
+            padding: 40px 10px 10px 10px;
+        }
+
+        .drawingview > div > div#Drawing {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        div#Drawing > svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /*设备告警展示*/
+        .warningview > marquee > table,
+        .warningview > table {
+            table-layout: fixed;
+            width: 100%;
+            padding: 36px 5px 0 0px;
+            border-spacing: 11px;
+        }
+
+        .warningview > marquee > table > tbody > tr > td,
+        .warningview > table > tbody > tr > td {
+            overflow: hidden;
+        }
+
+        .warningview > marquee > table > tbody > tr > td,
+        .warningview > table > tbody > tr > td {
+            width: 80px;
+            font-family: "Microsoft YaHei";
+            font-weight: bold;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .warningview > marquee > table > tbody > tr > td > span,
+        .warningview > table > tbody > tr > td > span {
+            font-family: "Microsoft YaHei";
+            font-weight: bold;
+            font-size: 12px;
+            color: #fff;
+            word-break: break-word;
+        }
+
+        #WarningNumTable {
+        }
+
+        marquee {
+            overflow: hidden;
+            height: 310px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="frame">
+        <div class="title"><span>红旗L平台Andon目视化屏</span></div>
+        <span id="time">--</span>
+        <table id="tb">
+            <tr>
+                <td>
+                    <div class="box_corner  yieldview">
+                        <span class="subtitle">产量信息</span>
+                        <table>
+                            <tr>
+                                <td>日计划数</td>
+                                <td><span id="DailyPlanNum">--</span></td>
+                                <td class="mr-4per">实际完成</td>
+                                <td><span id="DailyFinishedNum">--</span></td>
+                            </tr>
+                            <tr>
+                                <td>周计划数</td>
+                                <td><span id="WeekPlanNum">--</span></td>
+                                <td>实际完成</td>
+                                <td><span id="WeekFinishedNum">--</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+                <td rowspan="3">
+                    <div class="box_corner drawingview">
+                        <span class="subtitle">设备状态</span>
+                        <div>
+                            <div id="Drawing">
+								<svg version="1.1" id="N117Box" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+									  viewBox="-298 417.502 2625.439 1993.42"
+									 enable-background="new -298 417.502 2625.439 1993.42" xml:space="preserve">
+								<rect x="372.187" y="1623.969" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="1267.719" height="251.358"/>
+								<rect x="-296.455" y="1886.956" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="653.975" height="523.466"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="UB11ST30" xlink:href="images/workStation_state.png"  transform="matrix(2.649947e-008 2.2222 -2.2222 2.649947e-008 179.9714 1992.3701)">
+								</image>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="UB11ST10" xlink:href="images/workStation_state.png"  transform="matrix(-9.713544e-008 -2.2222 2.2222 -9.713544e-008 -58.8875 2031.5)">
+								</image>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="UB11ST20" xlink:href="images/workStation_state.png"  transform="matrix(-9.713544e-008 -2.2222 2.2222 -9.713544e-008 -251.032 2027.7422)">
+								</image>
+								<g>
+									<rect id="UB11ST10R02" x="27.251" y="2033.961" fill="none" width="89.938" height="94.104"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(-0.6518 0 0 0.5142 117.238 2033.0693)">
+									</image>
+								</g>
+								<g>
+									<rect id="UB11ST10R01" x="-156.613" y="2034.406" fill="none" width="89.948" height="94.104"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6518 0 0 0.5142 -156.6545 2033.5176)">
+									</image>
+								</g>
+								<g>
+
+										<text id="UB11_Model" transform="matrix(0.909 0 -0.3726 0.928 -167.7332 2362.5293)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="31.0677">xx</text>
+
+										<text transform="matrix(0.909 0 -0.3726 0.928 -282.5471 2363.9014)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="31.0677">Model: </text>
+
+										<text id="UB11_VIN" transform="matrix(0.909 0 -0.3726 0.928 -213.9055 2309.1201)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="31.0677">-----------------</text>
+
+										<text transform="matrix(0.8528 0 -0.3495 0.9369 -281.8362 2309.7441)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="33.116">VIN: </text>
+								</g>
+								<rect x="-297.5" y="1029.25" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="655.02" height="844.725"/>
+								<text transform="matrix(0.9319 0 -0.3562 0.9344 -281.8474 1084.0713)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40">滚边岛</text>
+								<g>
+									<rect id="R0110030R02" x="42.118" y="1406.531" fill="none" width="90.707" height="96.348"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6479 0 0 0.5236 42.1296 1406.5635)">
+									</image>
+								</g>
+								<g>
+									<rect id="R0110030R01" x="-206.16" y="1406.693" fill="none" width="90.674" height="95.493"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.657 0 0 0.5218 -206.1887 1405.8135)">
+									</image>
+								</g>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="RO11020" xlink:href="images/workStation_state.png"  transform="matrix(2.2714 0 0 2.0997 -4.9705 1579.7881)">
+								</image>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="RO11030" xlink:href="images/workStation_state.png"  transform="matrix(1.9534 0 0 2.4679 -8.8386 1219.1602)">
+								</image>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="RO11010" xlink:href="images/workStation_state.png"  transform="matrix(2.3189 0 0 2.0997 -251.2214 1579.5928)">
+								</image>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="RO11040" xlink:href="images/workStation_state.png"  transform="matrix(2.0984 0 0 2.4565 -249.2703 1219.3711)">
+								</image>
+								<rect x="-297.5" y="417.502" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="655.02" height="599.975"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="UB111020" xlink:href="images/workStation_state.png"  transform="matrix(2.0877 0 0 2.5686 -247.2517 743.1421)">
+								</image>
+								<text transform="matrix(0.7164 0 -0.2683 0.9633 -201.0955 607.7842)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.1137">UB111010</text>
+								<g>
+
+										<text id="HW1A_UB11_Model" transform="matrix(0.8397 0 -0.3442 0.9389 -166.9265 997.9209)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="36">xx</text>
+
+										<text transform="matrix(0.8397 0 -0.3442 0.9389 -283.4124 999.4844)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="36">Model: </text>
+
+										<text id="HW1A_UB11_VIN" transform="matrix(0.8397 0 -0.3442 0.9389 -211.9783 937.0474)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="36">-----------------</text>
+
+										<text transform="matrix(0.7866 0 -0.3224 0.9466 -282.6511 937.814)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="36">VIN: </text>
+								</g>
+								<rect x="372.187" y="1886.956" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="1267.719" height="523.466"/>
+								<g>
+
+										<text id="MB21_Model" transform="matrix(0.8397 0 -0.3266 0.9452 512.5442 2360.6104)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="35.0096">xx</text>
+
+										<text transform="matrix(0.7965 0 -0.3266 0.9452 403.1204 2360.6113)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="33.3358">Model：</text>
+
+										<text id="MB21_VIN" transform="matrix(0.7965 0 -0.3266 0.9452 469.4553 2307.8477)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="33.3358">-----------------</text>
+
+										<text transform="matrix(0.7965 0 -0.3266 0.9452 403.176 2307.8477)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="33.3358">VIN: </text>
+								</g>
+								<text transform="matrix(0.7798 0 -0.298 0.9546 395.5359 1934.1064)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="41.8426">主焊岛</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="MB210040" xlink:href="images/workStation_state.png"  transform="matrix(2.2222 0 0 2.2222 878.0779 2278.5508)">
+								</image>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="MB210010" xlink:href="images/workStation_state.png"  transform="matrix(-2.2222 0 0 2.2222 723.4441 2034.793)">
+								</image>
+								<g>
+									<rect id="MB210010R02" x="574.729" y="1905.204" fill="none" width="90.699" height="96.364"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6479 0 0 0.5236 574.7322 1905.1953)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB210010R06" x="832.8" y="1900.298" fill="none" width="89.98" height="94.988"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6521 0 0 0.5143 832.7961 1900.2969)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB210010R08" x="952.895" y="1900.294" fill="none" width="89.979" height="94.989"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6521 0 0 0.5143 952.887 1900.293)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB21FB15R04" x="700.129" y="1902.688" fill="none" width="89.98" height="94.989"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6521 0 0 0.5143 700.1223 1902.6875)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB210010R01" x="577.448" y="2152.06" fill="none" width="89.992" height="94.986"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6428 0 0 0.5161 577.449 2152.0527)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB210010R05" x="832.776" y="2150.089" fill="none" width="89.979" height="94.986"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6521 0 0 0.5143 832.7668 2150.082)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB210010R07" x="952.899" y="2149.464" fill="none" width="89.982" height="94.986"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6521 0 0 0.5143 952.8928 2149.457)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB21FB15R03" x="700.118" y="2152.065" fill="none" width="89.984" height="94.989"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6521 0 0 0.5143 700.1145 2152.0566)">
+									</image>
+								</g>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="MB210050" xlink:href="images/workStation_state.png"  transform="matrix(-9.713544e-008 -2.2222 2.2222 -9.713544e-008 1071.5891 1973.1602)">
+								</image>
+								<text transform="matrix(-0.0078 0.8397 -0.9204 -0.3909 1103.7742 1980.7305)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">MB210050</text>
+								<rect x="372.187" y="1086.287" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="1267.719" height="521.575"/>
+								<g>
+
+										<text transform="matrix(0.8397 0 -0.3155 0.9489 486.5793 1581.7295)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="35">xx</text>
+
+										<text transform="matrix(0.7695 0 -0.3155 0.9489 383.0901 1581.7305)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="34.0959">Model: </text>
+
+										<text transform="matrix(0.7695 0 -0.3155 0.9489 448.6604 1527.54)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="34.0959">-----------------</text>
+
+										<text transform="matrix(0.7695 0 -0.3155 0.9489 383.1506 1527.54)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="34.0959">VIN: </text>
+								</g>
+								<g>
+
+										<text transform="matrix(0.8397 0 -0.3155 0.9489 488.6575 1859.209)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="35">xx</text>
+
+										<text transform="matrix(0.7695 0 -0.3155 0.9489 385.1677 1859.21)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="34.0959">Model: </text>
+
+										<text transform="matrix(0.7695 0 -0.3155 0.9489 450.7375 1805.0186)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="34.0959">-----------------</text>
+
+										<text transform="matrix(0.7695 0 -0.3155 0.9489 385.2278 1805.0186)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="34.0959">VIN: </text>
+								</g>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="LW111035" xlink:href="images/workStation_state.png"  transform="matrix(2.946877e-008 2.4712 2.2776 -2.716011e-008 1073.7 1643.082)">
+								</image>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="LW111030" xlink:href="images/workStation_state.png"  transform="matrix(2.612145e-008 2.1905 2.1584 -2.573866e-008 1131.0637 1352.4668)">
+								</image>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="LW111025" xlink:href="images/workStation_state.png"  transform="matrix(1.9401 0 0 2.0997 938.4197 1147.1279)">
+								</image>
+								<text transform="matrix(0.6998 0 -0.2333 0.9724 994.155 1198.7334)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="33.858">LW111025</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="LW111010" xlink:href="images/workStation_state.png"  transform="matrix(2.629078e-008 2.2047 2.1013 -2.505775e-008 853.6423 1353.96)">
+								</image>
+								<g>
+									<rect id="LW111010R03" x="972.03" y="1492.103" fill="none" width="90.687" height="96.367"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6476 0 0 0.5238 972.0193 1492.0918)">
+									</image>
+								</g>
+								<g>
+									<rect id="LW11FB15R01" x="965.375" y="1310.78" fill="none" width="90.686" height="96.363"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6477 0 0 0.5238 965.3621 1310.7744)">
+									</image>
+								</g>
+								<g>
+									<rect id="LW111010R05" x="819.262" y="1219.454" fill="none" width="90.646" height="95.472"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.657 0 0 0.5218 819.2 1218.5479)">
+									</image>
+								</g>
+								<g>
+									<rect id="LW11FB15R04" x="723.809" y="1497.579" fill="none" width="90.646" height="95.479"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6569 0 0 0.5218 723.7478 1496.6826)">
+									</image>
+								</g>
+								<g>
+									<rect id="LW11FB15R02" x="714.784" y="1307.081" fill="none" width="90.647" height="95.476"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6569 0 0 0.5218 714.7283 1306.1826)">
+									</image>
+								</g>
+								<text transform="matrix(0.7529 0 -0.2878 0.9577 400.8792 1132.7783)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40">激光岛</text>
+								<text transform="matrix(0.7529 0 -0.2878 0.9577 398.0847 1669.8477)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40">激光岛上下件</text>
+								<text transform="matrix(0.6917 0 -0.2306 0.973 668.449 1171.5986)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="33.8538">LW111015</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="LW111015" xlink:href="images/workStation_state.png"  transform="matrix(-1.935 0 0 2.0997 644.7297 1122.1357)">
+								</image>
+								<rect x="372.187" y="736.852" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="1265.626" height="337.323"/>
+								<g>
+
+										<text id="HW1A_WELD_Model" transform="matrix(0.8397 0 -0.3266 0.9452 832.0447 1042.7207)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="32.0022">xx</text>
+
+										<text transform="matrix(0.7965 0 -0.3266 0.9452 723.7351 1042.7188)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="32.0022">Model: </text>
+
+										<text id="HW1A_WELD_VIN" transform="matrix(0.7965 0 -0.3266 0.9452 463.4417 1042.7207)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="32.0022">-----------------</text>
+
+										<text transform="matrix(0.7965 0 -0.3266 0.9452 397.1663 1042.7207)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="32.0022">VIN: </text>
+								</g>
+								<g>
+									<rect id="HW1AWE30R02" x="584.244" y="768.066" fill="none" width="90.688" height="96.378"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6479 0 0 0.5237 584.2595 768.0815)">
+									</image>
+								</g>
+								<g>
+									<rect id="HW1AWE30R01" x="987.867" y="768.756" fill="none" width="89.985" height="95"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(-0.6428 0 0 0.5162 1077.8464 768.7656)">
+									</image>
+								</g>
+								<text transform="matrix(0.6916 0 -0.2306 0.973 482.054 933.251)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="34.2555">WELD1025</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="HW1AWE25" xlink:href="images/workStation_state.png"  transform="matrix(-1.9345 0 0 2.0997 470.448 884.042)">
+								</image>
+								<text transform="matrix(0.7618 0 -0.2911 0.9567 395.5251 783.1035)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="35.7058">焊接岛上下件</text>
+								<text transform="matrix(0.6935 0 -0.2312 0.9729 1057.0955 933.27)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="34.264">WELD1035</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="HW1AWE35" xlink:href="images/workStation_state.png"  transform="matrix(-1.9275 0 0 2.1487 1044.9285 883.5967)">
+								</image>
+								<text transform="matrix(0.7857 0 -0.2619 0.9651 772.7004 823.0342)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="30.1526">WELD1015</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="HW1AWE15" xlink:href="images/workStation_state.png"  transform="matrix(-1.9401 0 0 2.0997 759.8591 772.6553)">
+								</image>
+								<text transform="matrix(0.6935 0 -0.2312 0.9729 766.7712 933.2461)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="34.264">WELD1030</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="HW1AWE30" xlink:href="images/workStation_state.png"  transform="matrix(-1.9275 0 0 2.1487 760.03 883.5693)">
+								</image>
+								<rect x="372.187" y="417.502" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="1267.719" height="309.547"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="WELD1010" xlink:href="images/workStation_state.png"  transform="matrix(-1.9401 0 0 2.0997 850.2029 528.8779)">
+								</image>
+								<text transform="matrix(0.7424 0 -0.2475 0.9689 850.2258 579.5415)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="33.833">WELD1010</text>
+								<g>
+									<rect id="WELD1010R02" x="960.02" y="621.986" fill="none" width="90.704" height="96.368"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6478 0 0 0.5238 960.0461 621.9922)">
+									</image>
+								</g>
+								<g>
+									<rect id="WELD1010R04" x="837.106" y="621.909" fill="none" width="90.686" height="96.372"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6478 0 0 0.5237 837.1243 621.9038)">
+									</image>
+								</g>
+								<g>
+									<rect id="WELD1010R01" x="999.434" y="430.275" fill="none" width="90.661" height="95.491"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.657 0 0 0.5218 999.3884 429.3931)">
+									</image>
+								</g>
+								<g>
+									<rect id="WELD1010R03" x="897.115" y="431.842" fill="none" width="90.663" height="95.494"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.657 0 0 0.5218 897.0681 430.9595)">
+									</image>
+								</g>
+								<g>
+									<rect id="WELD1010R05" x="790.375" y="429.835" fill="none" width="90.652" height="95.493"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6569 0 0 0.5218 790.3347 428.9497)">
+									</image>
+								</g>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="WELD1050" xlink:href="images/workStation_state.png"  transform="matrix(1.9401 0 0 2.0997 516.3689 534.0068)">
+								</image>
+								<g>
+
+										<text id="WELD_Model" transform="matrix(0.6989 0 -0.2865 0.9581 517.1956 711.2573)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="36">xx</text>
+
+										<text transform="matrix(0.6989 0 -0.2865 0.9581 398.5325 713.0146)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="36">Model: </text>
+
+										<text id="WELD_VIN" transform="matrix(0.6989 0 -0.2865 0.9581 462.8865 655.0215)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="36">-----------------</text>
+
+										<text transform="matrix(0.6531 0 -0.2677 0.9635 398.0872 655.7749)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="36">VIN: </text>
+								</g>
+								<rect x="1653.524" y="1886.956" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="674.25" height="523.466"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="MB221010" xlink:href="images/workStation_state.png"  transform="matrix(1.9401 0 0 2.0997 1692.6917 2087.9873)">
+								</image>
+								<g>
+									<rect id="MB221010R02" x="1837.195" y="2181.538" fill="none" width="90.7" height="94.979"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6479 0 0 0.5161 1837.1965 2181.5225)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB221010R04" x="1668.508" y="2182.374" fill="none" width="90.674" height="96.377"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6571 0 0 0.5218 1668.4758 2182.3877)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB221010R01" x="1839.316" y="1973.188" fill="none" width="90.701" height="96.366"/>
+
+										<image overflow="visible" enable-background="new    " width="140" height="184" xlink:href="images/Robert_left.png"  transform="matrix(0.6479 0 0 0.5237 1839.3362 1973.1836)">
+									</image>
+								</g>
+								<g>
+									<rect id="MB221010R03" x="1666.341" y="1973.655" fill="none" width="90.688" height="96.351"/>
+
+										<image overflow="visible" enable-background="new    " width="138" height="183" xlink:href="images/Robert_right.png"  transform="matrix(0.6572 0 0 0.5216 1666.3625 1973.627)">
+									</image>
+								</g>
+								<text transform="matrix(0.7798 0 -0.298 0.9546 1685.1565 1928.5869)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="41.8426">测量岛</text>
+								<g>
+
+										<text id="MB22_Model" transform="matrix(0.8029 0 -0.3266 0.9452 1782.2463 2373.3525)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="33.5536">xx</text>
+
+										<text transform="matrix(0.7965 0 -0.3266 0.9452 1676.0383 2373.3525)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="33.3358">Model:</text>
+
+										<text id="MB22_VIN" transform="matrix(0.7965 0 -0.3266 0.9452 1742.3772 2320.5898)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="33.3358">-----------------</text>
+
+										<text transform="matrix(0.7965 0 -0.3266 0.9452 1676.0969 2320.5898)" fill="#F2E966" font-family="'MicrosoftYaHei-Bold'" font-size="33.3358">VIN: </text>
+								</g>
+								<rect x="1653.524" y="1537.631" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="674.25" height="337.696"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="MB231010" xlink:href="images/workStation_state.png"  transform="matrix(1.9401 0 0 2.0997 1718.9202 1650.0811)">
+								</image>
+								<text transform="matrix(0.7798 0 -0.298 0.9546 1676.1252 1586.7412)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40.0091">调整线</text>
+								<rect x="1653.524" y="1172.812" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="673.916" height="351.125"/>
+								<rect x="1653.524" y="418.002" fill="#2F7FB8" stroke="#D9D9D9" stroke-miterlimit="10" width="674" height="743.904"/>
+								<text transform="matrix(0.7798 0 -0.298 0.9546 1685.1555 466.4795)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40.0091">立体库</text>
+								<text transform="matrix(0.9319 0 -0.3562 0.9344 395.5334 464.6387)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40">焊接岛</text>
+								<text transform="matrix(0.9319 0 -0.3562 0.9344 1669.8362 1218.7168)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40">AGV</text>
+								<text transform="matrix(0.9319 0 -0.3562 0.9344 -281.8474 466.4707)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40">地板岛上件</text>
+								<text transform="matrix(0.9319 0 -0.3562 0.9344 -281.8494 1931.7939)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="40.3829">地板岛</text>
+								<text transform="matrix(0.7424 0 -0.2475 0.9689 552.8787 584.667)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="33.833">WELD1050</text>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0.7166 0 -0.2736 0.9618 -201.0906 795.0679)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.104">UB111020</text>
+								</g>
+								<text transform="matrix(0.6935 0 -0.2312 0.9729 1765.218 1703.7441)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="33.8618">MB231010</text>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0.6229 0 -0.2931 0.9561 -191.1741 1273.0088)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36.3945">RO110040</text>
+								</g>
+								<text transform="matrix(0.6066 0 -0.2272 0.9739 53.4153 1272.5752)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36.6142">RO110030</text>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0.7314 0 -0.3219 0.9468 -197.8835 1630.3037)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="30.9944">RO110010</text>
+								</g>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0.718 0 -0.316 0.9488 52.1882 1630.5371)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="30.9316">RO110020</text>
+								</g>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0 0.7803 -0.9373 -0.3484 1167.0549 1400.3096)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="32.8581">LW111030</text>
+								</g>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0 0.8036 -0.9344 -0.3562 887.615 1391.6455)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="32.1171">LW111010</text>
+								</g>
+								<text transform="matrix(0 0.8037 -0.9634 -0.2679 1104.0212 1686.2061)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="32.0379">LW111035</text>
+								<text transform="matrix(0 0.7538 -0.9679 -0.2513 -231.0427 2056.4639)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">UB11ST20</text>
+								<text transform="matrix(0 0.7538 -0.9679 -0.2513 -30.5105 2056.4668)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">UB11ST10</text>
+								<text transform="matrix(0 0.7538 -0.9679 -0.2513 172.051 2050.2969)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">UB11ST30</text>
+								<text transform="matrix(0.7855 0 -0.2942 0.9557 920.9099 2336.4795)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="35.9895">MB210040</text>
+								<text transform="matrix(0.7855 0 -0.2942 0.9557 736.9041 2094.3818)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="35.9895">MB210010</text>
+								<text transform="matrix(0.6935 0 -0.2312 0.9729 1742.4309 2141.9814)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="33.8618">MB221010</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1759.4846 1289.5664)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Red1</text>
+								<rect x="-252.479" y="552.922" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.27" height="85.039"/>
+								<rect x="-252.479" y="742.792" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.27" height="85.039"/>
+								<rect x="509.465" y="529.255" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.268" height="85.039"/>
+								<rect x="810.306" y="524.127" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.268" height="85.039"/>
+								<rect x="436.231" y="879.29" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="217.639" height="85.038"/>
+								<rect x="720.318" y="769.306" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.27" height="85.04"/>
+								<rect x="720.301" y="879.29" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.268" height="85.038"/>
+								<rect x="1007.587" y="879.766" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.268" height="85.039"/>
+								<text transform="matrix(0.6935 0 -0.2312 0.9729 1342.2981 933.27)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="34.264">WELD1035</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="HW1AWE35_2_" xlink:href="images/workStation_state.png"  transform="matrix(-1.9275 0 0 2.1487 1330.1331 883.5967)">
+								</image>
+								<rect x="1292.789" y="879.766" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.27" height="85.04"/>
+								<rect x="-257.402" y="1217.866" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.27" height="85.04"/>
+								<rect x="-17.673" y="1218.04" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.269" height="85.039"/>
+								<rect x="610.47" y="1117.385" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="217.69" height="85.039"/>
+								<rect x="938.402" y="1142.379" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.271" height="85.038"/>
+								<rect x="854.591" y="1349.743" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="84.054" height="218.269"/>
+								<rect x="1131.232" y="1349.743" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="84.876" height="218.269"/>
+								<rect x="1071.133" y="1639.736" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="85.04" height="218.269"/>
+								<rect x="-257.402" y="1577.638" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.27" height="85.039"/>
+								<rect x="-10.973" y="1577.836" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.269" height="85.039"/>
+								<rect x="681.514" y="2029.8" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="250" height="90"/>
+								<rect x="867.401" y="2275.557" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="250" height="90"/>
+								<rect x="-63.49" y="1986.385" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="90" height="250"/>
+								<rect x="138.959" y="1986.385" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="90" height="250"/>
+								<rect x="-256.038" y="1986.385" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="90" height="250"/>
+								<rect x="1073.211" y="1929.794" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="90.002" height="250"/>
+								<rect x="1689.048" y="2082.553" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.268" height="85.039"/>
+								<rect x="1714.179" y="1645.329" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="218.268" height="85.039"/>
+								<rect x="1704.99" y="1248.843" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="160" height="60"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AGV_Red1" xlink:href="images/workStation_state.png"  transform="matrix(2.2222 0 0 2.2222 1704.9915 1241.918)">
+								</image>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1930.4905 1289.5664)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Red2</text>
+								<rect x="1875.992" y="1248.843" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="160" height="60"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AGV_Red2" xlink:href="images/workStation_state.png"  transform="matrix(2.2222 0 0 2.2222 1875.9915 1241.918)">
+								</image>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 2100.4768 1289.5664)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Red3</text>
+								<rect x="2045.98" y="1248.843" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="160" height="60"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AGV_Red3" xlink:href="images/workStation_state.png"  transform="matrix(2.2222 0 0 2.2222 2045.9797 1241.918)">
+								</image>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1759.4866 1377.7227)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Blue1</text>
+								<rect x="1704.99" y="1337.001" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="160" height="60"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AGV_Blue1" xlink:href="images/workStation_state.png"  transform="matrix(2.2222 0 0 2.2222 1704.9915 1335.0742)">
+								</image>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1930.4915 1378.1807)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Blue2</text>
+								<rect x="1875.992" y="1337.46" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="160" height="60"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AGV_Blue2" xlink:href="images/workStation_state.png"  transform="matrix(2.2222 0 0 2.2222 1875.9915 1335.5352)">
+								</image>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1750.4856 1463.0215)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Orange</text>
+								<rect x="1704.99" y="1422.298" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="160" height="60"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AGV_Orange" xlink:href="images/workStation_state.png"  transform="matrix(2.2222 0 0 2.2222 1704.9915 1420.3711)">
+								</image>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1930.4856 1465.4795)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Green</text>
+								<rect x="1875.992" y="1424.757" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="160" height="60"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AGV_Green" xlink:href="images/workStation_state.png"  transform="matrix(2.2222 0 0 2.2222 1875.9915 1421.832)">
+								</image>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1264.2971 842.3872)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1382.3147 786.2397)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Blue1_WELD1015</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1382.4954 852.5972)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Blue2_WELD1015</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1377.8079 1005.666)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Green_WELD1035</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1260.1658 789.9551)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1265.7732 1179.2783)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1265.7043 1133.5645)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1256.2322 1991.1406)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1258.9841 1943.5205)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 279.4841 1973.4639)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 278.8679 1923.7197)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1265.99 519.519)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1261.3879 462.9355)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1382.1047 1934.8838)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red1_MB210010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1382.8967 1997.7617)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red2_MB210010</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 1380.5481 2056.6357)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Red3_MB210010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1383.2473 2287.4912)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Green_MB210040</text>
+								<text transform="matrix(0.7141 0 -0.2381 0.9712 1382.3831 2343.25)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36.8213">Green_MB210050</text>
+								<text transform="matrix(0.7042 0 -0.2348 0.972 116.7068 2284.5518)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="34.0675">Red1_UB11ST10</text>
+								<text transform="matrix(0.7042 0 -0.2348 0.972 117.4275 2335.7568)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="34.0675">Red2_UB11ST10</text>
+								<text transform="matrix(0.703 0 -0.2344 0.9721 115.2947 2383.6377)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="34.0643">Red3_UB11ST10</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 115.8528 587.9517)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red1_UB111020</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 116.6433 650.0645)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red2_UB111020</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 114.2952 714.6045)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Red3_UB111020</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 113.7502 526.0713)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Green_UB111020</text>
+								<text transform="matrix(0.7141 0 -0.2381 0.9712 113.1526 470.0137)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36.8213">Green_UB111010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1381.968 1136.2393)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red1_LW111010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1382.759 1198.4395)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red2_LW111010</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 1380.4104 1254.4697)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Red3_LW111010</text>
+								<text transform="matrix(0.7141 0 -0.2355 0.9719 1376.5627 1842.0938)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36.8243">Orange_LW11035</text>
+								<text transform="matrix(0.7141 0 -0.2381 0.9712 1379.3674 1313.2334)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36.8213">Orange_LW11030</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 2073.7268 1606.6279)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red1_MB231010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 2074.5178 1669.8271)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red2_MB231010</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 2072.1682 1728.8574)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Red3_MB231010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 2091.0061 1940.209)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red1_MB221010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 2091.7971 2009.4102)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red2_MB221010</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 2089.4475 2078.4365)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Red3_MB221010</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="LW111040" xlink:href="images/workStation_state.png"  transform="matrix(2.953435e-008 2.4767 2.2904 -2.731275e-008 776.8748 1642.875)">
+								</image>
+								<text id="LW111040txt" transform="matrix(0 0.8012 -0.9637 -0.2671 807.3269 1686.0938)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="32.2128">LW111040</text>
+								<rect x="774.53" y="1639.736" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="85.039" height="218.269"/>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1377.8284 1674.4307)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red1_LW111040</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1378.6194 1730.6309)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red2_LW111040</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 1376.2688 1789.6602)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Red3_LW111040</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="MB210060" xlink:href="images/workStation_state.png"  transform="matrix(-1.061750e-007 -2.429 2.2222 -9.713544e-008 414.8352 2031.501)">
+								</image>
+								<text id="MB210060txt" transform="matrix(-0.0078 0.8397 -0.9204 -0.3909 445.0212 2037.3213)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">MB210060</text>
+								<rect x="414.46" y="1986.385" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="90.002" height="250"/>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1383.0022 2115.9443)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red1_MB210060</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 1382.7932 2174.6064)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red2_MB210060</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 1381.4426 2234.4873)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Red3_MB210060</text>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AUTS1010" xlink:href="images/workStation_state.png"  transform="matrix(3.167129e-008 2.6559 2.14 -2.551925e-008 1716.217 736.9985)">
+								</image>
+								<text id="AUTS1010txt" transform="matrix(0 1.0223 -0.9401 -0.3408 1749.6565 785.5039)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="25.6449">AUTS1010</text>
+								<rect x="1714.49" y="737.729" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="85.04" height="217.518"/>
+								<image overflow="visible" enable-background="new    " width="18" height="18" id="AUTS1015" xlink:href="images/workStation_state.png"  transform="matrix(3.167129e-008 2.6559 2.1401 -2.552044e-008 1883.1389 736.311)">
+								</image>
+								<text id="AUTS1015txt" transform="matrix(0 1.0223 -0.9401 -0.3408 1914.3049 784.8115)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="25.6451">AUTS1015</text>
+								<rect x="1879.143" y="737.081" fill="none" stroke="#00DEFF" stroke-width="4" stroke-miterlimit="10" width="85.039" height="217.52"/>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 2070.926 472.3955)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Blue1_AUTS1010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 2071.718 536.5303)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Blue2_AUTS1010</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 2069.3694 600.0688)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Orange_AUTS1010</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 2069.9817 664.8184)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red1_AUTS1015</text>
+								<text transform="matrix(0.7065 0 -0.2355 0.9719 2070.7737 727.7612)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2879">Red2_AUTS1015</text>
+								<text transform="matrix(0.7053 0 -0.2351 0.972 2068.4231 793.6353)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="37.2841">Red3_AUTS1015</text>
+								<circle id="LW11_F_Estop" fill="#D3D3D3" cx="1231.471" cy="1122.375" r="14.173"/>
+								<circle id="LW11_F_Input_1" fill="#D3D3D3" cx="1231.688" cy="1170.383" r="14.173"/>
+								<circle id="AGV_Red1_In_LW111010" fill="#D3D3D3" cx="1353.49" cy="1119.122" r="14.173"/>
+								<circle id="AGV_Red2_In_LW111010" fill="#D3D3D3" cx="1353.49" cy="1180.717" r="14.173"/>
+								<circle id="AGV_Red3_In_LW111010" fill="#D3D3D3" cx="1353.49" cy="1238.424" r="14.173"/>
+								<circle id="AGV_Red1_In_LW111040" fill="#D3D3D3" cx="1352.09" cy="1659.23" r="14.173"/>
+								<circle id="AGV_Red2_In_LW111040" fill="#D3D3D3" cx="1351.089" cy="1720.513" r="14.173"/>
+								<circle id="AGV_Red3_In_LW111040" fill="#D3D3D3" cx="1351.089" cy="1775.481" r="14.173"/>
+								<circle id="AGV_Organge_In_LW11030" fill="none" cx="1353.77" cy="1295.805" r="14.173"/>
+								<circle id="AGV_Organge_In_LW11035" fill="#D3D3D3" cx="1350.367" cy="1830.459" r="14.173"/>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 9.032 516.3706)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 8.9622 470.6553)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<circle id="HW1A_F_Estop_UB20" fill="#D3D3D3" cx="-25.27" cy="459.469" r="14.173"/>
+								<circle id="HW1A_F_Input_UB20" fill="#D3D3D3" cx="-25.053" cy="507.476" r="14.173"/>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 277.2034 1116.9727)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 277.1345 1071.2578)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<circle id="RO11_F_Estop" fill="#D3D3D3" cx="242.902" cy="1060.069" r="14.173"/>
+								<circle id="RO11_F_Input" fill="#D3D3D3" cx="243.117" cy="1108.076" r="14.173"/>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1255.7078 1720.8115)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1255.6379 1675.0977)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<circle id="HW1A_F_Estop_LW11" fill="#D3D3D3" cx="1221.406" cy="1663.91" r="14.173"/>
+								<circle id="HW1A_F_Input_LW11" fill="#D3D3D3" cx="1221.621" cy="1711.917" r="14.173"/>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1980.0715 1983.8047)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1980.0022 1938.0898)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<circle id="MB22_F_Estop" fill="#D3D3D3" cx="1945.77" cy="1926.902" r="14.173"/>
+								<circle id="MB22_F_Input" fill="#D3D3D3" cx="1945.986" cy="1974.909" r="14.174"/>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1955.553 515.5986)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">安全</text>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1955.4827 469.8853)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">急停</text>
+								<circle id="AUTS_F_Estop" fill="#D3D3D3" cx="1921.25" cy="458.697" r="14.173"/>
+								<circle id="AUTS_F_Input" fill="#D3D3D3" cx="1921.466" cy="506.705" r="14.174"/>
+								<circle id="HW1A_F_Estop_WELD" fill="#D3D3D3" cx="1231.187" cy="778.293" r="14.173"/>
+								<circle id="HW1A_F_Input_WELD" fill="#D3D3D3" cx="1231.502" cy="831.607" r="14.173"/>
+								<circle id="AGV_Blue2_In_WELD1015" fill="#D3D3D3" cx="1356.42" cy="839.901" r="14.173"/>
+								<circle id="AGV_Blue1_In_WELD1015" fill="#D3D3D3" cx="1356.418" cy="776.088" r="14.173"/>
+								<circle id="AGV_Green_In_WELD1035" fill="#D3D3D3" cx="1351.731" cy="994.477" r="14.173"/>
+								<text transform="matrix(0.7471 0 -0.2491 0.9685 1378.3528 1057.2578)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Green_WELD1040</text>
+								<circle id="AGV_Green_In_WELD1040" fill="#D3D3D3" cx="1352.276" cy="1046.068" r="14.173"/>
+								<circle id="WELD_F_Estop" fill="#D3D3D3" cx="1232.983" cy="448.764" r="14.173"/>
+								<circle id="WELD_F_Input" fill="#D3D3D3" cx="1233.768" cy="508.638" r="14.173"/>
+								<circle id="AGV_Blue1_In_AUTS1010" fill="#D3D3D3" cx="2045.576" cy="458.469" r="14.173"/>
+								<circle id="AGV_Blue2_In_AUTS1010" fill="#D3D3D3" cx="2045.576" cy="523.153" r="14.173"/>
+								<circle id="AGV_Organge_In_AUTS1010" fill="#D3D3D3" cx="2045.576" cy="586.485" r="14.173"/>
+								<circle id="AGV_Red1_In_AUTS1015" fill="#D3D3D3" cx="2045.576" cy="648.682" r="14.173"/>
+								<circle id="AGV_Red2_In_AUTS1015" fill="#D3D3D3" cx="2045.576" cy="709.117" r="14.173"/>
+								<circle id="AGV_Red3_In_AUTS1015" fill="#D3D3D3" cx="2045.576" cy="779.634" r="14.173"/>
+								<circle id="AGV_Red1_In_MB231010" fill="#D3D3D3" cx="2047.511" cy="1595.904" r="14.173"/>
+								<circle id="AGV_Red2_In_MB231010" fill="#D3D3D3" cx="2047.511" cy="1653.91" r="14.173"/>
+								<circle id="AGV_Red3_In_MB231010" fill="#D3D3D3" cx="2047.511" cy="1717.714" r="14.173"/>
+								<circle id="AGV_Red1_In_MB221010" fill="#D3D3D3" cx="2065.414" cy="1926.143" r="14.173"/>
+								<circle id="AGV_Red2_In_MB221010" fill="#D3D3D3" cx="2065.414" cy="1996.603" r="14.173"/>
+								<circle id="AGV_Red3_In_MB221010" fill="#D3D3D3" cx="2065.414" cy="2068.625" r="14.173"/>
+								<circle id="MB21_F_Estop" fill="#D3D3D3" cx="1226.345" cy="1929.772" r="14.173"/>
+								<circle id="MB21_F_Input" fill="#D3D3D3" cx="1226.593" cy="1980.422" r="14.173"/>
+								<circle id="UB11_F_Estop" fill="#D3D3D3" cx="252.966" cy="1909.428" r="14.173"/>
+								<circle id="UB11_F_Input" fill="#D3D3D3" cx="252.351" cy="1962.464" r="14.173"/>
+								<circle id="AGV_Red3_In_UB111020" fill="#D3D3D3" cx="92.881" cy="702.707" r="14.173"/>
+								<circle id="AGV_Red2_In_UB111020" fill="#D3D3D3" cx="92.881" cy="632.912" r="14.173"/>
+								<circle id="AGV_Red1_In_UB111020" fill="#D3D3D3" cx="92.881" cy="574.704" r="14.173"/>
+								<circle id="AGV_Green_In_UB111020" fill="#D3D3D3" cx="92.882" cy="513.584" r="14.173"/>
+								<circle id="AGV_Green_In_UB111010" fill="#D3D3D3" cx="92.882" cy="455.661" r="14.173"/>
+								<circle id="AGV_Red1_In_UB11ST10" fill="#D3D3D3" cx="93.523" cy="2275.557" r="14.173"/>
+								<circle id="AGV_Red2_In_UB11ST10" fill="#D3D3D3" cx="93.523" cy="2322.549" r="14.173"/>
+								<circle id="AGV_Red3_In_UB11ST10" fill="#D3D3D3" cx="93.523" cy="2373.318" r="14.173"/>
+								<circle id="AGV_Red1_In_MB210010" fill="#D3D3D3" cx="1354.23" cy="1924.051" r="14.173"/>
+								<circle id="AGV_Red2_In_MB210010" fill="#D3D3D3" cx="1354.23" cy="1983.684" r="14.173"/>
+								<circle id="AGV_Red3_In_MB210010" fill="#D3D3D3" cx="1354.23" cy="2045.113" r="14.173"/>
+								<circle id="AGV_Red1_In_MB210060" fill="#D3D3D3" cx="1354.23" cy="2101.1" r="14.173"/>
+								<circle id="AGV_Red2_In_MB210060" fill="#D3D3D3" cx="1354.23" cy="2157.542" r="14.173"/>
+								<circle id="AGV_Red3_In_MB210060" fill="#D3D3D3" cx="1354.23" cy="2220.328" r="14.173"/>
+								<circle id="AGV_Green_In_MB210040" fill="#D3D3D3" cx="1354.23" cy="2273.334" r="14.173"/>
+								<circle id="AGV_Green_IN_MB210050" fill="#D3D3D3" cx="1354.23" cy="2331.17" r="14.173"/>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0.7471 0 -0.2491 0.9685 1383.5774 461.9976)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Blue1_WELD1010</text>
+								</g>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0.7471 0 -0.2491 0.9685 1383.7581 518.354)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Blue2_WELD1010</text>
+								</g>
+								<circle id="AGV_Blue2_In_WELD1010" fill="#D3D3D3" cx="1357.684" cy="505.66" r="14.174"/>
+								<circle id="AGV_Blue1_In_WELD1010" fill="#D3D3D3" cx="1357.683" cy="451.845" r="14.173"/>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0.7471 0 -0.2491 0.9685 1381.7629 574.9253)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Blue1_WELD1050</text>
+								</g>
+								<g enable-background="new    ">
+
+										<text transform="matrix(0.7471 0 -0.2491 0.9685 1381.9446 630.2827)" fill="#00DEFF" font-family="'MicrosoftYaHei-Bold'" font-size="36">Blue2_WELD1050</text>
+								</g>
+								<circle id="AGV_Blue2_In_WELD1050" fill="#D3D3D3" cx="1355.869" cy="615.586" r="14.174"/>
+								<circle id="AGV_Blue1_In_WELD1050" fill="#D3D3D3" cx="1355.867" cy="561.772" r="14.173"/>
+							</svg>
+
+							</div>
+                        </div>
+                    </div>
+                </td>
+                <td rowspan="3">
+                    <div class="box_corner bulletinview">
+                        <span class="subtitle">公告信息</span>
+                        <div>
+                            <iframe id="Bulletin" src="../../大屏通告/html/bulletinBoard.html" scrolling="no"
+                                    frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="box_corner warningchartview">
+                        <span class="subtitle">告警统计</span>
+                        <div>
+                            <div id="WarningChart"></div>
+                        </div>
+                    </div>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="box_corner warningview">
+                        <span class="subtitle11">设备告警</span>
+                        <!--<span id="WarningNum" class="warningnum">0/0</span>-->
+                        <table>
+                            <tr>
+                                <td>时间</td>
+                                <td>设备</td>
+                                <td>内容</td>
+                            </tr>
+                        </table>
+                        <marquee direction="up" scrolldelay="300">
+                            <table id="WarningNumTable">
+                            </table>
+                        </marquee>
+                    </div>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+
+    var warningchart = echarts.init(document.getElementById('WarningChart'), null,
+        {
+            width: 290,
+            height: 17 * 9
+        });
+    var warningchartoptions = {
+        grid: {
+            top: "5px",
+            left: "50%",
+            right: "28px",
+            bottom: "10px"
+        },
+        yAxis: {
+            type: 'category',
+            data: ['1', '2', '3', '4', '5', '6', '7', '8'],
+            axisLabel: {
+                color: '#fff'
+            },
+            axisTick: {
+                show: false
+            },
+            axisLine: {
+                show: true
+            },
+            inverse: true
+        },
+        xAxis: {
+            type: 'value',
+            show: false
+        },
+        series: [
+            {
+                type: 'bar',
+                label: {
+                    show: true,
+                    position: 'right',
+                    color: '#fff'
+                },
+                showBackground: true,
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {offset: 0, color: '#83bff6'},
+                        {offset: 0.5, color: '#188df0'},
+                        {offset: 1, color: '#188df0'}
+                    ])
+                },
+                emphasis: {
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {offset: 0, color: '#2378f7'},
+                            {offset: 0.7, color: '#2378f7'},
+                            {offset: 1, color: '#83bff6'}
+                        ])
+                    }
+                },
+                data: []
+            }
+        ]
+    };
+    warningchart.setOption(warningchartoptions);
+
+    var flashstatus = false;    //闪烁指示灯状态，true是点亮
+    $(function () {
+
+        //指示灯闪烁
+        setInterval(function () {
+            var lights = $("image[val='true']")
+            if (flashstatus) {
+                lights.attr("xlink:href", "images/workStation_state.png")
+                flashstatus = false;
+            }
+            else {
+                lights.attr("xlink:href", "images/workStation_state0.png")
+                flashstatus = true;
+            }
+        }, 500);
+
+        //定时刷新公告板
+        setInterval(function () {
+            $('#Bulletin')[0].contentWindow.location.reload();
+        }, 300000);
+
+        var warninglist = [];   //告警信息列表
+        var warningnum = 0;     //当前正在显示的告警下标
+    });
+
+    //刷新数据调用
+    function RefreshData(jsonlist) {
+        for (var i = 0; i < jsonlist.length; i++) {
+            var item = jsonlist[i];
+
+            //刷新产量状态
+            if (item.tagtype == "STAT") {
+                var reg = /\./g;
+                var t = $("#" + item.tagname.replace(reg, "\\."));     //查找对应的显示项
+                if (t.length > 0) t.html(item.text);
+            }
+
+            //刷新设备状态
+            if (item.tagtype == "ST") {
+                var reg = /\./g;
+                var t = $("#" + item.tagname.replace(reg, "\\."));     //查找对应的显示项
+                //背景变色
+                if (t.length > 0 && t[0].localName == "rect") {
+                    if (item.text == "true" || item.text == "True")
+                        t.attr('fill', 'red');
+                    else
+                        t.attr('fill', 'none');
+                }
+
+                //指示灯闪烁
+                if (t.length > 0 && t[0].localName == "image") {
+                    if (item.text == "true" || item.text == "True") {
+                        t.attr('val', 'true');
+                        t.attr("xlink:href", "images/workStation_state0.png")
+                    }
+                    else {
+                        t.removeAttr('val');
+                        t.attr("xlink:href", "images/workStation_state.png")
+                    }
+                }
+
+                //指示灯状态
+                if (t.length > 0 && t[0].localName == "circle") {
+                    if (item.tagname.indexOf('AGV_') >= 0) {
+                        if (item.text == "true" || item.text == "True")
+                            t.attr('fill', 'lightgreen');
+                        else
+                            t.attr('fill', 'lightgray');
+                    }
+                    else {
+                        if (item.text == "true" || item.text == "True")
+                            t.attr('fill', 'red');
+                        else
+                            t.attr('fill', 'lightgray');
+                    }
+                }
+            }
+
+            //刷新告警统计图
+            if (item.tagname == 'WarningChart') {
+                var labels = [];
+                var values = [];
+                item.detaillist.forEach(function (e, index) {
+                    labels.push(e.warningcode);
+                    values.push(parseInt(e.text));
+                });
+                var options = warningchart.getOption();
+                options.yAxis[0].data = labels;
+                options.series[0].data = values;
+                warningchart.setOption(options);
+            }
+
+            //刷新告警列表
+            if (item.tagname == "WarningList") {
+                renderWarnList(item.detaillist)
+            }
+        }
+    }
+
+    //保存DIV大小
+    save_h1 = 0;
+    save_w1 = 0;
+
+    function renderWarnList(warninglist) {
+        var cont = "";
+        for (const ele of warninglist) {
+            cont += "<tr>";
+            cont += "<td><span id=\"WarningTime\">" + ele.warningtime + "</span></td>";
+            cont += "<td><span id=\"WarningCode\">" + ele.warningcode + "</span></td>";
+            cont += "<td><span id=\"WarningDesc\">" + ele.text + "</span></td>";
+            cont += "</tr>"
+        }
+        $("#WarningNumTable").append(cont);
+    }
+
+    //窗体大小变化时调整缩放比例
+    //TODO：页面自适应
+    function divresize() {
+        h = $(".frame").height().toFixed(4);
+        w = $(".frame").width().toFixed(4);
+        h1 = $(".container").height().toFixed(4);
+        w1 = $(".container").width().toFixed(4);
+        if (w1 != save_w1 || h1 != save_h1) {
+            //div大小有变动，保持当前大小并变换显示比例
+            save_w1 = w1;
+            save_h1 = h1;
+            var ratioy = h1 / h;
+            var ratiox = w1 / w;
+            $('.frame').css({
+                'transform': 'scale(' + ratiox + ', ' + ratioy + ')',
+                'transform-origin': '0 0',
+            });
+        }
+    };
+
+    var timer = 0;   //计时器
+    function onwindowresize() {
+        clearTimeout(timer);
+        timer = setTimeout(divresize, 100);
+    };
+    window.onload = onwindowresize;
+    window.onresize = onwindowresize;
+</script>
+</body>
+</html>
+
+
+
+
+
+
